@@ -2,33 +2,32 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import path from 'path';
-import { router } from './routes';
+import {CONFIG, DATABASE_CONFIG, LOG_MESSAGES, MESSAGES, PATHS} from "./consts.ts";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const { serverPort: port } = CONFIG;
 
 app.use(cors());
 app.use(express.json());
 
 // Serve uploaded files
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
-app.use('/api', router);
+app.use('/' + PATHS.uploadsDirectory, express.static(path.join(process.cwd(), PATHS.uploadsDirectory)));
 
 // Basic error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+    console.error(err.stack);
+    res.status(500).json({ error: MESSAGES.errors.genericError });
 });
 
-// Connect to MongoDB (update URL when ready)
-mongoose.connect('mongodb://localhost:27017/image-share')
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Connect to MongoDB
+mongoose
+    .connect(DATABASE_CONFIG.mongoUri)
+    .then(() => {
+        console.log(LOG_MESSAGES.mongoConnected);
+        app.listen(port, () => {
+            console.log(LOG_MESSAGES.serverRunning(port));
+        });
+    })
+    .catch((error) => {
+        console.error(LOG_MESSAGES.mongoConnectionError, error);
     });
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-  });

@@ -1,10 +1,11 @@
 import multer from 'multer';
 import path from 'path';
+import {CONFIG, MESSAGES, PATHS, RANDOM_SUFFIX_CONFIG} from "../consts.ts"; // Import constants
 
 const storage = multer.diskStorage({
-  destination: 'uploads/',
+  destination: PATHS.uploadsDirectory+ '/',
   filename: (_req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * RANDOM_SUFFIX_CONFIG.randomMultiplier)}`;
     cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
   },
 });
@@ -12,14 +13,13 @@ const storage = multer.diskStorage({
 export const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: CONFIG.uploadMaxFileSize, // Use constant for file size limit
   },
   fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (allowedTypes.includes(file.mimetype)) {
+    if (CONFIG.uploadAllowedFileTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
+      cb(new Error(MESSAGES.errors.invalidFileType)); // Use constant for error message
     }
   },
 });

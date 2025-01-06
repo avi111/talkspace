@@ -10,6 +10,5 @@ export type UploadResponse = {
 }
 
 export type APIError = {
-    message: string;
-    code?: string;
+    error: string;
 }

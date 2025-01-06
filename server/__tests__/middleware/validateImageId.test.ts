@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateImageId } from '../../middleware/validateImageId';
+import {MESSAGES, STATUS_CODES} from "../../consts";
 
 describe('validateImageId middleware', () => {
   let mockRequest: Partial<Request>;
@@ -34,8 +35,8 @@ describe('validateImageId middleware', () => {
 
     validateImageId(mockRequest as Request, mockResponse as Response, nextFunction);
 
-    expect(mockResponse.status).toHaveBeenCalledWith(400);
-    expect(jsonMock).toHaveBeenCalledWith({ error: 'Invalid image ID format' });
+    expect(mockResponse.status).toHaveBeenCalledWith(STATUS_CODES.badRequest); // Use constant
+    expect(jsonMock).toHaveBeenCalledWith({ error: MESSAGES.errors.invalidImageId }); // Use constant
     expect(nextFunction).not.toHaveBeenCalled();
   });
 });
