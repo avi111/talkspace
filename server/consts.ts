@@ -1,3 +1,5 @@
+import path from "path";
+
 export const MESSAGES = {
     errors: {
         noImageUploaded: 'No image uploaded',
@@ -47,3 +49,5 @@ export const STATUS_CODES = {
 };
 
 export const DEFAULT_EXPIRY_TIME_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+export const UPLOADS_DIR = path.join(process.cwd(), PATHS.uploadsDirectory);

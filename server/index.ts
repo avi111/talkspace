@@ -1,18 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import path from 'path';
-import {CONFIG, DATABASE_CONFIG, LOG_MESSAGES, MESSAGES, PATHS} from "./consts";
+import cron from 'node-cron';
+import {CONFIG, DATABASE_CONFIG, LOG_MESSAGES, MESSAGES, PATHS, UPLOADS_DIR} from "./consts";
+import { router } from './routes';
+import {cleanupExpiredImages} from "./controllers/imageController";
 
 const app = express();
 const {serverPort: port} = CONFIG;
-import { router } from './routes';
 
 app.use(cors());
 app.use(express.json());
 
 // Serve uploaded files
-app.use('/' + PATHS.uploadsDirectory, express.static(path.join(process.cwd(), PATHS.uploadsDirectory)));
+app.use('/' + PATHS.uploadsDirectory, express.static(UPLOADS_DIR));
 app.use('/api', router);
 
 // Basic error handling
@@ -35,5 +36,22 @@ if(process.env.NODE_ENV !== 'test') {
             console.error(LOG_MESSAGES.mongoConnectionError, error);
         });
 }
+
+process.on('SIGINT', async () => {
+    try {
+        await mongoose.connection.close();
+        console.log('MongoDB connection closed');
+        process.exit(0);
+    } catch (error) {
+        console.error('Error during shutdown:', error);
+        process.exit(1);
+    }
+});
+
+// Schedule the cron job to run every minute
+cron.schedule('* * * * *', async () => {
+    console.log('Running cleanup job:', new Date().toISOString());
+    await cleanupExpiredImages();
+});
 
 export default app;
