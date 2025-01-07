@@ -24,7 +24,7 @@ export const ImageUploadCard: React.FC = () => {
             if (files[0] && expiresAt && expiresAt.isValid() && expiresAt.isAfter(dayjs())) {
                 mutation.mutate({file: files[0], expiresAt: expiresAt.toDate()});
             } else {
-
+                setExpiresAt(null);
             }
         },
         disabled: invalidExpiresAt,
@@ -70,6 +70,12 @@ export const ImageUploadCard: React.FC = () => {
                         imageUrl={mutation.data.url}
                         expiryDate={mutation.data.expiryDate}
                     />
+                )}
+
+                {mutation.isError && (
+                    <FormHelperText error>
+                        {mutation.error?.message || 'An error occurred'}
+                    </FormHelperText>
                 )}
             </CardContent>
         </Card>

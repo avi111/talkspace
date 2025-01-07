@@ -1,8 +1,11 @@
 {
   "files": [],
+  "compilerOptions": {
+    "esModuleInterop": true
+  },
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
-  "exclude": ["cypress"]
+  "exclude": ["cypress", "server/__tests__"]
 }

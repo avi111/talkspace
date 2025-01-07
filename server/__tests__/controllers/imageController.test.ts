@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Image } from '../../models/Image';
 import { uploadImage, getImage } from '../../controllers/imageController';
 import { Readable } from 'node:stream';
-import {MESSAGES} from "../../consts";
+import {DEFAULT_EXPIRY_TIME_MS, MESSAGES, STATUS_CODES} from "../../consts";
 
 jest.mock('../../models/Image');
 
@@ -39,7 +39,7 @@ describe('imageController', () => {
         protocol: 'http',
         get: jest.fn().mockReturnValue('localhost:3000'),
         body: {
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() + DEFAULT_EXPIRY_TIME_MS),
         },
       };
     });
@@ -53,7 +53,7 @@ describe('imageController', () => {
 
       await uploadImage(mockRequest as Request, mockResponse as Response);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.status).toHaveBeenCalledWith(STATUS_CODES.created);
       expect(jsonMock).toHaveBeenCalledWith(
           expect.objectContaining({
             message: MESSAGES.success.imageUploaded, // Use constant
@@ -67,7 +67,7 @@ describe('imageController', () => {
 
       await uploadImage(mockRequest as Request, mockResponse as Response);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.status).toHaveBeenCalledWith(STATUS_CODES.badRequest);
       expect(jsonMock).toHaveBeenCalledWith({ error: MESSAGES.errors.noImageUploaded }); // Use constant
     });
   });
@@ -112,7 +112,7 @@ describe('imageController', () => {
 
       await getImage(mockRequest as Request, mockResponse as Response);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(410);
+      expect(mockResponse.status).toHaveBeenCalledWith(STATUS_CODES.gone);
       expect(jsonMock).toHaveBeenCalledWith({ error: MESSAGES.errors.imageExpired }); // Use constant
     });
   });

@@ -10,7 +10,7 @@ interface UploadResultProps {
 
 export const UploadResult: React.FC<UploadResultProps> = ({imageUrl, expiryDate}) => {
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(imageUrl);
+        void navigator.clipboard.writeText(imageUrl);
     };
 
     return (

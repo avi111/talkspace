@@ -1,6 +1,6 @@
 import multer from 'multer';
 import path from 'path';
-import {CONFIG, MESSAGES, PATHS, RANDOM_SUFFIX_CONFIG} from "../consts.ts"; // Import constants
+import {CONFIG, MESSAGES, PATHS, RANDOM_SUFFIX_CONFIG} from "../consts";
 
 const storage = multer.diskStorage({
   destination: PATHS.uploadsDirectory+ '/',

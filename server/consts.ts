@@ -43,6 +43,7 @@ export const STATUS_CODES = {
     notFound: 404,
     gone: 410,
     internalServerError: 500,
+    created: 201,
 };
 
 export const DEFAULT_EXPIRY_TIME_MS = 24 * 60 * 60 * 1000; // 24 hours

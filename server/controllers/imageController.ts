@@ -3,13 +3,13 @@ import * as path from 'path';
 import { Image } from '../models/Image';
 import { isImageExpired } from '../utils/imageUtils';
 import { APIError, UploadResponse } from '../types/image';
-import {DEFAULT_EXPIRY_TIME_MS, MESSAGES} from "../consts";
+import {DEFAULT_EXPIRY_TIME_MS, MESSAGES, STATUS_CODES} from "../consts";
 
 export const uploadImage = async (req: Request, res: Response<UploadResponse | APIError>) => {
     try {
         const { expiresAt } = req.body;
         if (!req.file) {
-            return res.status(400).json({
+            return res.status(STATUS_CODES.badRequest).json({
                 error: MESSAGES.errors.noImageUploaded,
             });
         }
@@ -33,7 +33,7 @@ export const uploadImage = async (req: Request, res: Response<UploadResponse | A
         });
     } catch (error) {
         console.error('Upload error:', error);
-        res.status(500).json({
+        res.status(STATUS_CODES.internalServerError).json({
             error: MESSAGES.errors.uploadFailed,
         });
     }
@@ -45,13 +45,13 @@ export const getImage = async (req: Request, res: Response<APIError>) => {
         const image = await Image.findById(imageId);
 
         if (!image) {
-            return res.status(404).json({
+            return res.status(STATUS_CODES.notFound).json({
                 error: MESSAGES.errors.imageNotFound,
             });
         }
 
         if (isImageExpired(image.expiryDate)) {
-            return res.status(410).json({
+            return res.status(STATUS_CODES.gone).json({
                 error: MESSAGES.errors.imageExpired,
             });
         }
@@ -61,7 +61,7 @@ export const getImage = async (req: Request, res: Response<APIError>) => {
         res.sendFile(imagePath);
     } catch (error) {
         console.error('Error serving image:', error);
-        res.status(500).json({
+        res.status(STATUS_CODES.internalServerError).json({
             error: MESSAGES.errors.serveFailed,
         });
     }
